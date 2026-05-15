@@ -77,7 +77,7 @@ if uploaded_file is not None:
     g = 9.81
     T0 = 2 * np.pi * np.sqrt(sC * H * (1 - alfa) / kc / g)
     
-    st.metric("Natural Initial Vibration period $T_0$", f"{T0:.4f} s")
+    st.metric("Natural Initial Vibration period $T_0$", f"{T0:.2f} s")
 
     # --- LOGICA DI CALCOLO ---
     if n_div > 1:
@@ -124,8 +124,8 @@ if uploaded_file is not None:
 
     # --- RISULTATI ---
     col1, col2 = st.columns(2)
-    col1.metric("Final displacement", f"{dx[-1]:.6f} m")
-    col2.metric("Max Acceleration", f"{np.max(kH):.4f} g")
+    col1.metric("Final displacement", f"{dx[-1]:.2f} m")
+    col2.metric("Max Acceleration", f"{np.max(kH):.2f} g")
 
     # --- GRAFICI RIDimensionati ---
     # Riducendo figsize e gestendo il layout miglioriamo la compattezza
