@@ -103,6 +103,7 @@ if uploaded_file is not None:
     time_plot = time[::n_div]
     kH_plot = kH[::n_div]
     dx_plot = dx[::n_div]
+    kc_plot = kc_vect[::n_div]
     a_eq_plot = a_eq # Già della dimensione corretta rispetto al tempo originario
 
     # --- RISULTATI ---
@@ -116,7 +117,7 @@ if uploaded_file is not None:
 
     axs[0].plot(time_plot, kH_plot, label="kH", linewidth=1)
     axs[0].plot(time_plot, -a_eq_plot, label="-a_base", alpha=0.7, linewidth=1)
-    axs[0].plot(time_plot, kc_vect, label="kC", alpha=0.7, linewidth=1)
+    axs[0].plot(time_plot, kc_plot, label="kC", alpha=0.7, linewidth=1)
     axs[0].set_ylabel("a (g)")
     axs[0].legend(fontsize='small')
 
