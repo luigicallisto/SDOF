@@ -113,23 +113,39 @@ if uploaded_file is not None:
 
     # --- GRAFICI RIDimensionati ---
     # Riducendo figsize e gestendo il layout miglioriamo la compattezza
-    fig, axs = plt.subplots(2, 2, figsize=(10, 7)) # Figsize ridotto da (10, 12) a (7, 9)
+    fig, axs = plt.subplots(
+    2, 2,
+    figsize=(12, 7),
+    gridspec_kw={'width_ratios': [3, 1]}  # prima colonna più larga
+)
 
+    # --- [0,0]
     axs[0,0].plot(time_plot, kH_plot, label="kH", linewidth=1)
     axs[0,0].plot(time_plot, -a_eq_plot, label="-a_base", alpha=0.7, linewidth=1)
     axs[0,0].plot(time_plot, kc_plot, label="kC", alpha=0.7, linewidth=1)
+    
     axs[0,0].set_ylabel("a (g)")
     axs[0,0].legend(fontsize='small')
-
+    
+    # --- [0,1]
     axs[0,1].plot(dx_plot, kH_plot, color='orange')
+    
     axs[0,1].set_xlabel("dx (m)")
-    axs[0,1].set_ylabel("kH)")
-
+    axs[0,1].set_ylabel("kH")
+    
+    # --- [1,0]
     axs[1,0].plot(time_plot, dx_plot, color='green')
+    
     axs[1,0].set_xlabel("time (s)")
     axs[1,0].set_ylabel("dx (m)")
-
+    
+    # --- [1,1] vuoto
+    axs[1,1].axis('off')
+    
     plt.tight_layout()
+    plt.show()
+
+   
 
     # Visualizzazione con larghezza controllata
     st.pyplot(fig, use_container_width=False)
