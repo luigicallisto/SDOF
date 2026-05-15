@@ -149,5 +149,26 @@ if uploaded_file is not None:
 
     # Visualizzazione con larghezza controllata
     st.pyplot(fig, use_container_width=False)
+
+        # --- DATAFRAME RISULTATI ---
+    results_df = pd.DataFrame({
+        "time_s": time_plot,
+        "kH_g": kH_plot,
+        "a_base_g": -a_eq_plot,
+        "kC_g": kc_plot,
+        "dx_m": dx_plot
+    })
+
+    # Conversione CSV
+    csv = results_df.to_csv(index=False).encode('utf-8')
+
+    # Pulsante download
+    st.download_button(
+        label="Download results as CSV",
+        data=csv,
+        file_name="seismic_response_results.csv",
+        mime="text/csv"
+    )
+    
 else:
     st.info("Upload accelerogram from sidebar")
