@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Seismic response of nonlinear SDOF", layout="wide")
 
-st.title("📊 Seismic response of earth retaining strctures" \
-"Luigi Callisto, Sapienza University of Rome, Italy")
+st.title("📊 Seismic response of earth retaining strctures")
+st.title("Luigi Callisto, Sapienza University of Rome, Italy")
 
 # --- SIDEBAR PER GLI INPUT ---
 st.sidebar.header("INPUT PARAMETERS") 
@@ -132,4 +132,4 @@ if uploaded_file is not None:
     # Visualizzazione con larghezza controllata
     st.pyplot(fig, use_container_width=False)
 else:
-    st.info("Inizia caricando un file Excel dell'accelerogramma dalla barra laterale.")
+    st.info("Upload accelerogram from siedebar")
