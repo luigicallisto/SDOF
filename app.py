@@ -24,7 +24,7 @@ n_div = st.sidebar.slider("No. of subdivisions of dt", 1, 500, 200)
 
 # --- CARICAMENTO FILE ---
 uploaded_file = st.sidebar.file_uploader(
-    "Upload accelerogram file",
+    "Upload accelerogram file (xlx, csv, txt format)",
     type=["xlsx", "csv", "txt"]
 )
 # -------------------------------------------------------------------------------
@@ -187,4 +187,4 @@ if uploaded_file is not None:
     )
     
 else:
-    st.info("Upload accelerogram from sidebar")
+    st.info("Upload accelerogram from sidebar: xlsx, txt, or csv format, a single column of data expressed in g")
