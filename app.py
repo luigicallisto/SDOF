@@ -23,7 +23,10 @@ dt_fixed = st.sidebar.number_input("Accelerogram sampling time (s)", value=0.02,
 n_div = st.sidebar.slider("No. of subdivisions of dt", 1, 500, 200)
 
 # --- CARICAMENTO FILE ---
-uploaded_file = st.sidebar.file_uploader("Upload accelerogram file (in g) (.xlsx)", type=["xlsx"])
+uploaded_file = st.sidebar.file_uploader(
+    "Upload accelerogram file",
+    type=["xlsx", "csv", "txt"]
+)
 # -------------------------------------------------------------------------------
 def acc_mod(k, n_div, col=1):
     """
@@ -51,8 +54,21 @@ def acc_mod(k, n_div, col=1):
     return k_mod.flatten()
 # -------------------------------------------------------------------------------
 if uploaded_file is not None:
-    # Lettura dati
-    FFF = pd.read_excel(uploaded_file, header=None).values
+
+    filename = uploaded_file.name.lower()
+
+    if filename.endswith(".xlsx"):
+        FFF = pd.read_excel(uploaded_file, header=None).values
+
+    elif filename.endswith(".csv"):
+        FFF = pd.read_csv(uploaded_file, header=None).values
+
+    elif filename.endswith(".txt"):
+        FFF = pd.read_csv(
+            uploaded_file,
+            header=None,
+            sep=r"\s+"
+        ).values
     n = FFF.shape[0]
     time_orig = np.arange(1, n + 1) * dt_fixed
     dt_acc = time_orig[1] - time_orig[0]
