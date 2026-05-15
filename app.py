@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Seismic response of nonlinear SDOF", layout="wide")
 
-st.title("📊 Seismic response of earth retaining strctures")
+st.title("Seismic response of earth retaining strctures")
 st.title("Luigi Callisto, Sapienza University of Rome, Italy")
 
 # --- SIDEBAR PER GLI INPUT ---
@@ -14,12 +14,12 @@ st.sidebar.header("INPUT PARAMETERS")
 H = st.sidebar.number_input("Excavatiom height (m)", value=3.5)
 kc = st.sidebar.number_input("Critical seismic coefficievt", value=0.2)
 alfa = st.sidebar.number_input("Hyperbola cut-off parameter Alfa", value=0.8)
-sC = st.sidebar.number_input("Normalised displacement at system capacity sC ", value=0.02)
+sC = st.sidebar.number_input("Normalised displacement at system capacity sC ", value=0.02, format="%.3f")
 beta = st.sidebar.number_input("Unloading-reloading factor Beta", value=1.0)
 csi_ur = st.sidebar.number_input("Damping ratio in unloading-reloading", value=0.01, format="%.3f")
 ampl = st.sidebar.number_input("Accelerogram amplification factor", value=1.0)
 segno = st.sidebar.selectbox("Accelerogram sign", [1, -1])
-dt_fixed = st.sidebar.number_input("accelerogram sampling time (s)", value=0.02, format="%.3f")
+dt_fixed = st.sidebar.number_input("Accelerogram sampling time (s)", value=0.02, format="%.3f")
 n_div = st.sidebar.slider("No. of subdivisions of dt", 1, 500, 200)
 
 # --- CARICAMENTO FILE ---
@@ -132,4 +132,4 @@ if uploaded_file is not None:
     # Visualizzazione con larghezza controllata
     st.pyplot(fig, use_container_width=False)
 else:
-    st.info("Upload accelerogram from siedebar")
+    st.info("Upload accelerogram from sidebar")
