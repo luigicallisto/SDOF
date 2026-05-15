@@ -125,9 +125,9 @@ if uploaded_file is not None:
     axs[2].set_xlabel("dx (m)")
     axs[2].set_ylabel("kH)")
 
-    axs[3].plot(time_plot, dx_plot, color='green')
-    axs[3].set_xlabel("time (s)")
-    axs[3].set_ylabel("dx (m)")
+    axs[1].plot(time_plot, dx_plot, color='green')
+    axs[1].set_xlabel("time (s)")
+    axs[1].set_ylabel("dx (m)")
 
     plt.tight_layout()
 
