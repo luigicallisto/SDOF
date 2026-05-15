@@ -22,7 +22,7 @@ dt_fixed = st.sidebar.number_input("dt - accelerogram sampling time (s)", value=
 n_div = st.sidebar.slider("n_div -No. of subdivisions of dt", 1, 500, 200)
 
 # --- CARICAMENTO FILE ---
-uploaded_file = st.sidebar.file_uploader("Carica il file Accelerogramma (.xlsx)", type=["xlsx"])
+uploaded_file = st.sidebar.file_uploader("Upload accelerogram file (in g) (.xlsx)", type=["xlsx"])
 # -------------------------------------------------------------------------------
 def acc_mod(k, n_div, col=1):
     """
@@ -60,7 +60,7 @@ if uploaded_file is not None:
     g = 9.81
     T0 = 2 * np.pi * np.sqrt(sC * H * (1 - alfa) / kc / g)
     
-    st.metric("Periodo Naturale Iniziale $T_0$", f"{T0:.4f} s")
+    st.metric("Natural Initial Vibration period $T_0$", f"{T0:.4f} s")
 
     # --- LOGICA DI CALCOLO ---
     if n_div > 1:
@@ -106,15 +106,15 @@ if uploaded_file is not None:
 
     # --- RISULTATI ---
     col1, col2 = st.columns(2)
-    col1.metric("Dislocamento Finale", f"{dx[-1]:.6f} m")
-    col2.metric("Accelerazione Max (g)", f"{np.max(kH):.4f}")
+    col1.metric("Final displacement", f"{dx[-1]:.6f} m")
+    col2.metric("Max Acceleration", f"{np.max(kH):.4f} g")
 
     # --- GRAFICI RIDimensionati ---
     # Riducendo figsize e gestendo il layout miglioriamo la compattezza
     fig, axs = plt.subplots(3, 1, figsize=(7, 9)) # Figsize ridotto da (10, 12) a (7, 9)
 
     axs[0].plot(time_plot, kH_plot, label="kH", linewidth=1)
-    axs[0].plot(time_plot, -a_eq_plot, label="-a_eq", alpha=0.7, linewidth=1)
+    axs[0].plot(time_plot, -a_eq_plot, label="-a_base", alpha=0.7, linewidth=1)
     axs[0].set_ylabel("a (g)")
     axs[0].legend(fontsize='small')
 
@@ -124,7 +124,7 @@ if uploaded_file is not None:
 
     axs[2].plot(time_plot, dx_plot, color='green')
     axs[2].set_xlabel("time (s)")
-    axs[2].set_ylabel("u (m)")
+    axs[2].set_ylabel("dx (m)")
 
     plt.tight_layout()
 
