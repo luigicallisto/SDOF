@@ -115,19 +115,19 @@ if uploaded_file is not None:
     # Riducendo figsize e gestendo il layout miglioriamo la compattezza
     fig, axs = plt.subplots(3, 1, figsize=(5, 7)) # Figsize ridotto da (10, 12) a (7, 9)
 
-    axs[0].plot(time_plot, kH_plot, label="kH", linewidth=1)
-    axs[0].plot(time_plot, -a_eq_plot, label="-a_base", alpha=0.7, linewidth=1)
-    axs[0].plot(time_plot, kc_plot, label="kC", alpha=0.7, linewidth=1)
-    axs[0].set_ylabel("a (g)")
-    axs[0].legend(fontsize='small')
+    axs[0,0].plot(time_plot, kH_plot, label="kH", linewidth=1)
+    axs[0,0].plot(time_plot, -a_eq_plot, label="-a_base", alpha=0.7, linewidth=1)
+    axs[0,01].plot(time_plot, kc_plot, label="kC", alpha=0.7, linewidth=1)
+    axs[0,0].set_ylabel("a (g)")
+    axs[0,0].legend(fontsize='small')
 
-    axs[2].plot(dx_plot, kH_plot, color='orange')
-    axs[2].set_xlabel("dx (m)")
-    axs[2].set_ylabel("kH)")
+    axs[0,1].plot(dx_plot, kH_plot, color='orange')
+    axs[0,1].set_xlabel("dx (m)")
+    axs[0,1].set_ylabel("kH)")
 
-    axs[1].plot(time_plot, dx_plot, color='green')
-    axs[1].set_xlabel("time (s)")
-    axs[1].set_ylabel("dx (m)")
+    axs[1,0].plot(time_plot, dx_plot, color='green')
+    axs[1,0].set_xlabel("time (s)")
+    axs[1,0].set_ylabel("dx (m)")
 
     plt.tight_layout()
 
