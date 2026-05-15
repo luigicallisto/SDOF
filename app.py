@@ -113,7 +113,7 @@ if uploaded_file is not None:
 
     # --- GRAFICI RIDimensionati ---
     # Riducendo figsize e gestendo il layout miglioriamo la compattezza
-    fig, axs = plt.subplots(3, 1, figsize=(7, 9)) # Figsize ridotto da (10, 12) a (7, 9)
+    fig, axs = plt.subplots(3, 1, figsize=(5, 7)) # Figsize ridotto da (10, 12) a (7, 9)
 
     axs[0].plot(time_plot, kH_plot, label="kH", linewidth=1)
     axs[0].plot(time_plot, -a_eq_plot, label="-a_base", alpha=0.7, linewidth=1)
