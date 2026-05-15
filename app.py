@@ -115,8 +115,8 @@ if uploaded_file is not None:
     # Riducendo figsize e gestendo il layout miglioriamo la compattezza
     fig, axs = plt.subplots(
     2, 2,
-    figsize=(12, 7),
-    gridspec_kw={'width_ratios': [3, 1]}  # prima colonna più larga
+    figsize=(15, 7),
+    gridspec_kw={'width_ratios': [2, 1]}  # prima colonna più larga
 )
 
     # --- [0,0]
