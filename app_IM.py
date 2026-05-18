@@ -277,8 +277,8 @@ if uploaded_file is not None:
         
         plt.tight_layout()
 
-        # Visualizzazione allineata al container di Streamlit
-        st.pyplot(fig, use_container_width=True)
+        # Visualizzazione con larghezza controllata
+        st.pyplot(fig, use_container_width=False)
 
         # --- DATAFRAME RISULTATI ---
         results_df = pd.DataFrame({
