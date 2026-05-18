@@ -78,7 +78,7 @@ if uploaded_file is not None:
     T0 = 2 * np.pi * np.sqrt(sC * H * (1 - alfa) / kc / g)
     # Mostra informazioni preliminari
     st.success("File loaded")  
-    st.metric("Initial vatural period $T_0$", f"{T0:.3f} s")
+    st.metric("Initial natural period $T_0$", f"{T0:.3f} s")
 
     # --- LOGICA DI CALCOLO ---
     if n_div > 1:
