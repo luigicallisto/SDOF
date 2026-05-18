@@ -6,21 +6,21 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Seismic response of nonlinear SDOF", layout="wide")
 
-st.title("Seismic response of displacing earth retaining structures")
+st.title("Seismic response of DISPLACING earth retaining structures")
 st.title("Luigi Callisto, Sapienza University of Rome, Italy")
 
 # --- SIDEBAR PER GLI INPUT ---
 st.sidebar.header("INPUT PARAMETERS") 
 H = st.sidebar.number_input("Excavatiom height (m)", value=3.5)
-kc = st.sidebar.number_input("Critical seismic coefficievt", value=0.2)
+kc = st.sidebar.number_input("Critical seismic coefficient", value=0.2)
 alfa = st.sidebar.number_input("Hyperbola cut-off parameter Alfa", value=0.8)
-sC = st.sidebar.number_input("Normalised displacement at system capacity sC ", value=0.02, format="%.3f")
+sC = st.sidebar.number_input("Normalised displacement at system capacity sC", value=0.02, format="%.3f")
 beta = st.sidebar.number_input("Unloading-reloading factor Beta", value=1.0)
 csi_ur = st.sidebar.number_input("Damping ratio in unloading-reloading", value=0.01, format="%.3f")
 ampl = st.sidebar.number_input("Accelerogram amplification factor", value=1.0)
 segno = st.sidebar.selectbox("Accelerogram sign", [1, -1])
 dt_fixed = st.sidebar.number_input("Accelerogram sampling time (s)", value=0.02, format="%.3f")
-n_div = st.sidebar.slider("No. of subdivisions of dt", 1, 500, 200)
+n_div = st.sidebar.slider("No. of subdivisions in dt", 1, 500, 200)
 
 # --- CARICAMENTO FILE ---
 uploaded_file = st.sidebar.file_uploader(
@@ -76,8 +76,9 @@ if uploaded_file is not None:
     
     g = 9.81
     T0 = 2 * np.pi * np.sqrt(sC * H * (1 - alfa) / kc / g)
-    
-    st.metric("Natural Initial Vibration period $T_0$", f"{T0:.2f} s")
+    # Mostra informazioni preliminari
+    st.success("File loaded")  
+    st.metric("Initial vatural period $T_0$", f"{T0:.3f} s")
 
     # --- LOGICA DI CALCOLO ---
     if n_div > 1:
@@ -124,8 +125,8 @@ if uploaded_file is not None:
 
     # --- RISULTATI ---
     col1, col2 = st.columns(2)
-    col1.metric("Final displacement", f"{dx[-1]:.2f} m")
-    col2.metric("Max Acceleration", f"{np.max(kH):.2f} g")
+    col1.metric("Final displacement", f"{dx[-1]:.3f} m")
+    col2.metric("Max Acceleration", f"{np.max(kH):.3f} g")
 
     # --- GRAFICI RIDimensionati ---
     # Riducendo figsize e gestendo il layout miglioriamo la compattezza
@@ -188,3 +189,4 @@ if uploaded_file is not None:
     
 else:
     st.info("Upload accelerogram from sidebar: xlsx, txt, or csv format, a single column of data expressed in g")
+
