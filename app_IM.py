@@ -91,7 +91,7 @@ def acc_mod(k, n_div):
 # INTERFACCIA UTENTE (STREAMLIT SIDEBAR)
 # =========================================================================
 st.title("Seismic response of NON-DISPLACING earth retaining structures (Iwan - Mroz model)")
-st.title("Luigi Callisto, Sapienza University of Rome, Italy")
+st.markdown("#### Luigi Callisto, Sapienza University of Rome, Italy")
 
 st.sidebar.header("INPUT PARAMETERS") 
 H = st.sidebar.number_input("Excavatiom height (m)", value=3.5, step=0.1)
