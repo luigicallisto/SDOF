@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 st.set_page_config(page_title="Seismic response of nonlinear SDOF", layout="wide")
 
 st.title("Seismic response of DISPLACING earth retaining structures")
-st.title("Luigi Callisto, Sapienza University of Rome, Italy")
+st.markdown("#### Luigi Callisto, Sapienza University of Rome, Italy")
 
 # --- SIDEBAR PER GLI INPUT ---
 st.sidebar.header("INPUT PARAMETERS") 
