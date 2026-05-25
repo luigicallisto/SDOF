@@ -173,7 +173,7 @@ else:
 # Ingressi specifici in base allo spettro scelto
 st.sidebar.markdown('<p style="font-size:28px; font-weight:bold; color:#00E676;">Spectral parameters</p>', unsafe_allow_html=True)
 gr = 9.81
-T = np.arange(0, 5.0, 0.002)
+T = np.arange(0, 20.0, 0.005)
 
 if Spectrum_Option == 'NTC':
     ag = st.sidebar.number_input("Outcrop PGA ag (g)", value=0.25, format="%.3f")
@@ -197,8 +197,8 @@ elif Spectrum_Option == 'EC81':
 elif Spectrum_Option == 'EC82 (evolution)':
     S_alfa = st.sidebar.number_input("Max spectral acceleration S_Alfa (g)", value=0.7, format="%.3f")
     S_beta = st.sidebar.number_input("Spectral acceleration at T=1s, S_Beta (g)", value=0.5)
-    F_alfa = st.sidebar.number_input("Amplification factor F_Alfa", value=2.0)
-    F_beta = st.sidebar.number_input("Amplification factor F_Beta", value=2.0)
+    F_alfa = st.sidebar.number_input("Amplification factor F_Alfa", value=1.0)
+    F_beta = st.sidebar.number_input("Amplification factor F_Beta", value=1.0)
     FT = st.sidebar.number_input("Topographic amplification factor FT", value=1.0, format="%.3f")
     csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
     csi = csi/100
@@ -233,9 +233,6 @@ elif Spectrum_Option == 'Custom':
 # =============================================================================
 # CALCOLO
 # =============================================================================
-
-# CORRETTO: Rimossa la vecchia funzione globale load_all_spectra() che causava NameError e Out of Memory
-
 Sd = Sa * gr / (4 * np.pi**2) * T**2
 
 # Capacity curve
