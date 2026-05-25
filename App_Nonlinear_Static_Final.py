@@ -18,7 +18,7 @@ st.set_page_config(page_title="NL Static analysis", layout="wide")
 
 @st.cache_data # Scarica e tiene in memoria i file una volta sola per tutti gli utenti
 def load_all_spectra():
-    file_names = ["SpettriN_5.mat", "SpettriN_10.mat", "SpettriN_15.mat", "SpettriN_20.mat"]
+    file_names = ["SpettriN_5_v2.mat", "SpettriN_10_v2.mat", "SpettriN_15_v2.mat", "SpettriN_20_v2.mat"]
     
     # ID univoci dei tuoi file su Google Drive (estratti dai tuoi link)
     ids = [
@@ -296,7 +296,7 @@ s_A, kH_A = intersect(s, s * D0 * betaD, Sd_ur / H, Sa_ur)
 DampingValues = np.array([.055, .10, .15, .20])
 idx = np.argmin(abs(DampingValues - smorz))
 NearValue = DampingValues[idx]
-NameSpectra = f"SpettriN_{int(NearValue * 100)}.mat"
+NameSpectra = f"SpettriN_{int(NearValue * 100)}_v2.mat"
 
 if Type_System == 'D':
     soglia = min(kC / kH_A, 1.0)
