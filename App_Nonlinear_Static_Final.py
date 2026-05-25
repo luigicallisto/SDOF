@@ -7,6 +7,7 @@ import scipy.io as sio
 import os
 import urllib.request
 from scipy.io import loadmat
+import requests
 
 # Configurazione della pagina Streamlit
 st.set_page_config(page_title="NL Static analysis", layout="wide")
@@ -19,26 +20,42 @@ st.set_page_config(page_title="NL Static analysis", layout="wide")
 def load_all_spectra():
     file_names = ["SpettriN_5.mat", "SpettriN_10.mat", "SpettriN_15.mat", "SpettriN_20.mat"]
     
-    # URL modificati per forzare il download diretto dell'HDF5/mat binario da Google Drive
-    urls = [
-        "https://docs.google.com/uc?export=download&id=1qxAKC4SU4rdEEJbUoZ0Gp0-Xheh8Xmqp",
-        "https://docs.google.com/uc?export=download&id=1ImYsCb_JZPpRoLqj9xVvZvUTfalk6MDR",
-        "https://docs.google.com/uc?export=download&id=120lstYVuhx0ApxrJU5D5HF03Nbeblxlv",
-        "https://docs.google.com/uc?export=download&id=138Aj0Le9Af-8YboexmscSJi_V9cwaPGi"
+    # ID univoci dei tuoi file su Google Drive (estratti dai tuoi link)
+    ids = [
+        "1qxAKC4SU4rdEEJbUoZ0Gp0-Xheh8Xmqp",
+        "1ImYsCb_JZPpRoLqj9xVvZvUTfalk6MDR",
+        "120lstYVuhx0ApxrJU5D5HF03Nbeblxlv",
+        "138Aj0Le9Af-8YboexmscSJi_V9cwaPGi"
     ]
+    
     database_spettri = {}
     
-    # Controlliamo ed eventualmente scarichiamo ogni singolo file
-    for name, url in zip(file_names, urls):
+    for name, file_id in zip(file_names, ids):
         if not os.path.exists(name):
             with st.spinner(f"Download di {name} in corso (richiede un momento)..."):
-                # Header fittizio per evitare che Google Drive rifiuti la connessione dello script
-                opener = urllib.request.build_opener()
-                opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-                urllib.request.install_opener(opener)
-                urllib.request.urlretrieve(url, name)
-        
-        # Carica il file .mat e lo inserisce nel dizionario
+                # URL per il download diretto che richiede il superamento dell'antivirus
+                download_url = "https://docs.google.com/uc?export=download"
+                
+                session = requests.Session()
+                # Prima richiesta per catturare l'eventuale token di conferma antivirus
+                response = session.get(download_url, params={'id': file_id}, stream=True)
+                
+                token = None
+                for key, value in response.cookies.items():
+                    if key.startswith('download_warning'):
+                        token = value
+                        break
+                
+                # Se Google Drive mostra la pagina di avviso, rifacciamo la richiesta col token di conferma
+                if token:
+                    params = {'id': file_id, 'confirm': token}
+                    response = session.get(download_url, params=params, stream=True)
+                
+                # Salviamo il file binario reale sul server di Streamlit
+                with open(name, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=32768):
+                        if chunk:
+                            f.write(chunk)
         database_spettri[name] = loadmat(name)
         
     return database_spettri
@@ -211,10 +228,11 @@ elif Spectrum_Option == 'Custom':
         f_interp = interp1d(T_Custom, Sa_Custom, bounds_error=False, fill_value="extrapolate")
         Sa = f_interp(T)
     else:
+        # Nota i due spazi alla fine di ogni riga qui sotto:
         st.sidebar.warning("""
-        ⚠️ Upload .xlsx, .txt, or .csv file<br>
-        • Periods (s) in first column<br>
-        • Spectral acceleration (g) in second column<br>
+        ⚠️ Upload .xlsx, .txt, or .csv file  
+        • Periods (s) in first column  
+        • Spectral acceleration (g) in second column  
         🚫 No headers.
         """)
         Sa = np.zeros_like(T)
