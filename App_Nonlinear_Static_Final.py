@@ -153,7 +153,7 @@ st.markdown("---")
 st.sidebar.markdown('<p style="font-size:28px; font-weight:bold; color:#00E676;">Initial choices</p>', unsafe_allow_html=True)
 # Parametri Generali
 Type_System = st.sidebar.radio("System Type", ['D', 'ND'], help="D = Displacing, ND = Non-Displacing")
-Spectrum_Option = st.sidebar.selectbox("Spectrum Option", ['NTC', 'EC81', 'EC82', 'Custom'])
+Spectrum_Option = st.sidebar.selectbox("Spectrum Option", ['NTC', 'EC81', 'EC82 (evolution)', 'Custom'])
 
 # Parametri Struttura e Modello
 st.sidebar.markdown('<p style="font-size:28px; font-weight:bold; color:#00E676;">Input quantities</p>', unsafe_allow_html=True)
@@ -161,8 +161,6 @@ H = st.sidebar.number_input("Excavation height H (m)", value=4.5, step=0.1, form
 kC = st.sidebar.number_input("Critical seismic coefficient", value=0.42, step=0.01, format="%.3f")
 alpha = st.sidebar.number_input("Hyperbola cut-off parameter Alfa", value=0.85, step=0.01, format="%.3f")
 sC = st.sidebar.number_input("Normalised displacement at system capacity sC", value=0.05, step=0.01, format="%.3f")
-csi = st.sidebar.number_input("Initial damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
-csi = csi/100
 
 if Type_System == 'D':
     betaD = st.sidebar.number_input("Unloading-reloading factor Beta", value=1.0, step=0.1)
@@ -185,6 +183,8 @@ if Spectrum_Option == 'NTC':
     F0 = st.sidebar.number_input("Amplification factor F0", value=2.30, format="%.3f")
     Cat = st.sidebar.selectbox("Subsoil Category", ['A', 'B', 'C', 'D', 'E'], index=3)
     ST = st.sidebar.number_input("Topographic amplification factor ST", value=1.0, format="%.3f")
+    csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
+    csi = csi/100
     Sa = FN_SpectrumNorm(T, ag, F0, Tc_g, csi, Cat, ST)
 
 elif Spectrum_Option == 'EC81':
@@ -192,17 +192,23 @@ elif Spectrum_Option == 'EC81':
     Type = st.sidebar.selectbox("Spectrum type (Type)", [1, 2], index=0)
     GroundType = st.sidebar.selectbox("GroundType", ['A', 'B', 'C', 'D', 'E'], index=1)
     ST = st.sidebar.number_input("Topographic amplification factor ST", value=1.0, format="%.3f")
+    csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
+    csi = csi/100
     Sa = FN_SpectrumEC8_1(T, ag, Type, GroundType, ST, csi)
 
-elif Spectrum_Option == 'EC82':
+elif Spectrum_Option == 'EC82(evloution)':
     S_alfa = st.sidebar.number_input("Max spectral acceleration S_Alfa (g)", value=0.7, format="%.3f")
     S_beta = st.sidebar.number_input("Spectral acceleration at T=1s, S_Beta (g)", value=0.5)
     F_alfa = st.sidebar.number_input("Amplification factor F_Alfa", value=2.0)
     F_beta = st.sidebar.number_input("Amplification factor F_Beta", value=2.0)
     FT = st.sidebar.number_input("Topographic amplification factor FT", value=1.0, format="%.3f")
+    csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
+    csi = csi/100
     Sa = FN_SpectrumEC8_2(T, S_alfa, S_beta, F_alfa, F_beta, FT, csi)
 
 elif Spectrum_Option == 'Custom':
+    csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
+    csi = csi/100
     uploaded_file = st.sidebar.file_uploader("(xlsx, csv, txt format)", type=["xlsx", "csv", "txt"])
     if uploaded_file is not None:
         filename = uploaded_file.name.lower()
