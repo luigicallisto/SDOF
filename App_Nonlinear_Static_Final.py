@@ -18,44 +18,33 @@ st.set_page_config(page_title="NL Static analysis", layout="wide")
 
 @st.cache_data # Scarica e tiene in memoria i file una volta sola per tutti gli utenti
 def load_all_spectra():
-    file_names = ["SpettriN_5_v2.mat", "SpettriN_10_v2.mat", "SpettriN_15_v2.mat", "SpettriN_20_v2.mat"]
+    file_names = ["SpettriN_5.mat", "SpettriN_10.mat", "SpettriN_15.mat", "SpettriN_20.mat"]
     
     # ID univoci dei tuoi file su Google Drive (estratti dai tuoi link)
-    ids = [
-        "1qxAKC4SU4rdEEJbUoZ0Gp0-Xheh8Xmqp",
-        "1ImYsCb_JZPpRoLqj9xVvZvUTfalk6MDR",
-        "120lstYVuhx0ApxrJU5D5HF03Nbeblxlv",
-        "138Aj0Le9Af-8YboexmscSJi_V9cwaPGi"
+    urls = [
+        "https://www.dropbox.com/scl/fi/la33lpwojhwxvbqp00090/SpettriN_5.mat?rlkey=r5a0r3yxwhwnqg1pda1t9d3ke&st=y0p2ywqi&dl=1",
+        "https://www.dropbox.com/scl/fi/ddnsldkhm644chety98n5/SpettriN_10.mat?rlkey=livs5fw39eidlcgp70gt4v54h&st=414j5vu1&dl=1",
+        "https://www.dropbox.com/scl/fi/jfpg3gkvk44v8oi7nl0p0/SpettriN_15.mat?rlkey=a5rndfk3b7dj0xvi8zf0gnbw0&st=o22ea3ur&dl=1",
+        "https://www.dropbox.com/scl/fi/od27dxjy0jxhayathaf5q/SpettriN_20.mat?rlkey=2326j6cqwuykkg38831lfrt7i&st=rqirbpu2&dl=1"
     ]
     
     database_spettri = {}
     
-    for name, file_id in zip(file_names, ids):
+    # Controlliamo ed eventualmente scarichiamo ogni singolo file
+    for name, url in zip(file_names, urls):
+        # Se sul server esiste un file vecchio corrotto da Google Drive (pesa pochi KB), lo cancelliamo
+        if os.path.exists(name) and os.path.getsize(name) < 1000000: 
+            os.remove(name)
+            
         if not os.path.exists(name):
-            with st.spinner(f"Download di {name} in corso (richiede un momento)..."):
-                # URL per il download diretto che richiede il superamento dell'antivirus
-                download_url = "https://docs.google.com/uc?export=download"
-                
-                session = requests.Session()
-                # Prima richiesta per catturare l'eventuale token di conferma antivirus
-                response = session.get(download_url, params={'id': file_id}, stream=True)
-                
-                token = None
-                for key, value in response.cookies.items():
-                    if key.startswith('download_warning'):
-                        token = value
-                        break
-                
-                # Se Google Drive mostra la pagina di avviso, rifacciamo la richiesta col token di conferma
-                if token:
-                    params = {'id': file_id, 'confirm': token}
-                    response = session.get(download_url, params=params, stream=True)
-                
-                # Salviamo il file binario reale sul server di Streamlit
-                with open(name, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=32768):
-                        if chunk:
-                            f.write(chunk)
+            with st.spinner(f"Download di {name} da Dropbox in corso (richiede solo un momento)..."):
+                # Configura un user-agent standard per evitare blocchi di rete
+                opener = urllib.request.build_opener()
+                opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+                urllib.request.install_opener(opener)
+                urllib.request.urlretrieve(url, name)
+        
+        # Carica il file .mat scaricato e lo inserisce nel dizionario
         database_spettri[name] = loadmat(name)
         
     return database_spettri
@@ -296,7 +285,7 @@ s_A, kH_A = intersect(s, s * D0 * betaD, Sd_ur / H, Sa_ur)
 DampingValues = np.array([.055, .10, .15, .20])
 idx = np.argmin(abs(DampingValues - smorz))
 NearValue = DampingValues[idx]
-NameSpectra = f"SpettriN_{int(NearValue * 100)}_v2.mat"
+NameSpectra = f"SpettriN_{int(NearValue * 100)}.mat"
 
 if Type_System == 'D':
     soglia = min(kC / kH_A, 1.0)
