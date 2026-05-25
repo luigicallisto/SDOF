@@ -92,6 +92,9 @@ def acc_mod(k, n_div):
 # =========================================================================
 st.title("Seismic response of NON-DISPLACING earth retaining structures (Iwan - Mroz model)")
 st.markdown("#### Luigi Callisto, Sapienza University of Rome, Italy")
+st.link_button("Based on L. Callisto (2027), Earth Retaining Strucutres, Design and Seismic Performance, CRC press", "https://www.routledge.com/Earth-Retaining-Structures-Design-and-Seismic-Performance/Callisto/p/book/9781041148449")
+st.link_button("More software", "https://luigicallisto.site.uniroma1.it/software")
+st.markdown("---") # Una linea orizzontale di separazione
 
 st.sidebar.header("INPUT PARAMETERS") 
 H = st.sidebar.number_input("Excavatiom height (m)", value=3.5, step=0.1)

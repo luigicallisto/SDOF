@@ -8,6 +8,9 @@ st.set_page_config(page_title="Seismic response of nonlinear SDOF", layout="wide
 
 st.title("Seismic response of DISPLACING earth retaining structures")
 st.markdown("#### Luigi Callisto, Sapienza University of Rome, Italy")
+st.link_button("Based on L. Callisto (2027), Earth Retaining Strucutres, Design and Seismic Performance, CRC press", "https://www.routledge.com/Earth-Retaining-Structures-Design-and-Seismic-Performance/Callisto/p/book/9781041148449")
+st.link_button("More software", "https://luigicallisto.site.uniroma1.it/software")
+st.markdown("---") # Una linea orizzontale di separazione
 
 # --- SIDEBAR PER GLI INPUT ---
 st.sidebar.header("INPUT PARAMETERS") 
@@ -78,7 +81,7 @@ if uploaded_file is not None:
     T0 = 2 * np.pi * np.sqrt(sC * H * (1 - alfa) / kc / g)
     # Mostra informazioni preliminari
     st.success("File loaded")  
-    st.metric("Initial natural period $T_0$", f"{T0:.3f} s")
+    st.metric("Initial vatural period $T_0$", f"{T0:.3f} s")
 
     # --- LOGICA DI CALCOLO ---
     if n_div > 1:
@@ -134,7 +137,7 @@ if uploaded_file is not None:
     2, 2,
     figsize=(15, 7),
     gridspec_kw={'width_ratios': [2, 1]}  # prima colonna più larga
-)
+    )
 
     # --- [0,0]
     axs[0,0].plot(time_plot, kH_plot, label="kH", linewidth=1)
@@ -143,6 +146,7 @@ if uploaded_file is not None:
     
     axs[0,0].set_ylabel("a (g)")
     axs[0,0].legend(fontsize='small')
+    axs[0,0].grid(True)
     
     # --- [0,1]
     axs[0,1].plot(dx_plot, kH_plot, color='orange')
@@ -161,10 +165,7 @@ if uploaded_file is not None:
     
     plt.tight_layout()
     plt.show()
-
-   
-
-    # Visualizzazione con larghezza controllata
+     # Visualizzazione con larghezza controllata
     st.pyplot(fig, use_container_width=False)
 
         # --- DATAFRAME RISULTATI ---
