@@ -2,6 +2,8 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.interpolate import interp1d
 
 # Configurazione della pagina Streamlit
 st.set_page_config(page_title="Analisi Dinamica Iwan-Mroz", layout="wide")
@@ -70,21 +72,22 @@ def calc_tau_IM(Q, dq, H_mat, R, Qalfa):
     return Q, Qalfa, D_val
 
 
-def acc_mod(k, n_div):
-    n_len = len(k)
-    k_mod = np.zeros(n_len * n_div)
-    for j in range(n_len):
-        k_mod[(j + 1) * n_div - 1] = k[j]
-        
-    for j in range(n_len):
-        a1 = j * n_div - 1
-        a2 = (j + 1) * n_div - 1
-        for jj in range(1, n_div):
-            if j == 0:
-                k_mod[jj - 1] = (k_mod[a2] / n_div) * jj
-            else:
-                k_mod[j * n_div + jj - 1] = k_mod[a1] + (k_mod[a2] - k_mod[a1]) / n_div * jj
-    return k_mod
+def acc_mod(k, n_div, _=None):
+    k = np.asarray(k)
+    n = len(k)
+    # Griglia temporale originale (grossolana) e nuova griglia (fitta)
+    x_old = np.arange(n)
+    x_new = np.arange(0, n - 1/n_div + 1e-12, 1/n_div)
+    # Interpolazione lineare simultanea su tutte le colonne
+    f = interp1d(
+        x_old,
+        k,
+        kind='linear',
+        axis=0,                # interpola lungo la prima dimensione
+        fill_value='extrapolate'
+    )
+    y = f(x_new)
+    return y
 
 
 # =========================================================================
@@ -196,9 +199,11 @@ if uploaded_file is not None:
             
             Du = DPd / Kd
             Dv = 3 / dt * Du - 3 * vel[i-1] - dt / 2 * accel[i-1]
+            Da = 6/dt**2 * Du - 6/dt * vel[i-1] -  3 * accel[i-1]
             
             u[i] = u[i-1] + Du
             vel[i] = vel[i-1] + Dv
+            accel[i] = accel[i-1] + Da
             s[i] = u[i] / H
             
             kh[i], k_alfa, D[i] = calc_tau_IM(kh[i-1], Du / H, H_IM, R_IM, k_alfa)
@@ -206,18 +211,6 @@ if uploaded_file is not None:
             if D[i] <= 1e-8:
                 D[i] = 1e-8
                 
-            accel[i] = accel[i-1] + (
-                -m_sist * (a_base[i] - a_base[i-1])
-                - c_sist * (vel[i] - vel[i-1])
-                - k_sist * (u[i] - u[i-1])
-            ) / m_sist
-            
-            # Aggiorna la barra di avanzamento ogni tanto per non rallentare
-            # if i % (max(1, n // 20)) == 0:
-                # prog_bar.progress(i / (n - 1), text="Elaborazione in corso...")
-                
-        # prog_bar.empty()
-
         # Post-Processing e contrazione dei vettori
         acc_tot = -(accel + a_base)
         time_plot = time[::n_div]
