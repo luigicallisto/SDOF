@@ -314,8 +314,7 @@ else:
 s1_tot = min(s_int, sC)
 s1 = s1_tot - kH_int / (betaD * D0)
 s_tot = s1 + Neq * s_A  
-# spostamento = s_tot * H  
-spostamento = s1_tot * H 
+
 T_int = 2 * np.pi * (H / gr * s_int / kH_int)**0.5
 
 # =============================================================================
@@ -344,7 +343,10 @@ col6.metric("Max Acceleration ($k_{H,int}$)", f"{kH_int:.3f} g")
 if Type_System == 'D':
     col3.metric("No. Equivalent Cycles ($N_{eq}$)", f"{Neq:.2f}")
     col7.metric("First Displacement", f"{s1*H:.3f} m")
-col8.metric("Max Transient Displacement", f"{spostamento:.3f} m")
+    col8.metric("Permanent Displacement", f"{s1 * H:.3f} m")
+elif Type_System == 'D':
+    col8.metric("Max Transient Displacement", f"{s1_tot * H:.3f} m")
+    
 
 st.markdown("---")
 
