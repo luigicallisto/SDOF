@@ -344,7 +344,7 @@ if Type_System == 'D':
     col3.metric("No. Equivalent Cycles ($N_{eq}$)", f"{Neq:.2f}")
     col7.metric("First Displacement", f"{s1*H:.3f} m")
     col8.metric("Permanent Displacement", f"{s1 * H:.3f} m")
-elif Type_System == 'D':
+elif Type_System == 'ND':
     col8.metric("Max Transient Displacement", f"{s1_tot * H:.3f} m")
     
 
