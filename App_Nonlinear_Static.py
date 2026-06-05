@@ -174,34 +174,8 @@ else:
 st.sidebar.markdown('<p style="font-size:28px; font-weight:bold; color:#00E676;">Spectral parameters</p>', unsafe_allow_html=True)
 gr = 9.81
 T = np.arange(0, 20.0, 0.005)
-Sa = None
-if Spectrum_Option == 'Custom':
-    csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
-    csi = csi/100
-    uploaded_file = st.sidebar.file_uploader("(xlsx, csv, txt format)", type=["xlsx", "csv", "txt"])
-    if uploaded_file is not None:
-        filename = uploaded_file.name.lower()
-        if filename.endswith(".xlsx"):
-            FFF = pd.read_excel(uploaded_file, header=None).values
-        elif filename.endswith(".csv"):
-            FFF = pd.read_csv(uploaded_file, header=None).values
-        elif filename.endswith(".txt"):
-            FFF = pd.read_csv(uploaded_file, header=None, sep=r"\s+", engine='python').values
-        T_Custom = FFF[:, 0]
-        Sa_Custom = FFF[:, 1]
-        f_interp = interp1d(T_Custom, Sa_Custom, bounds_error=False, fill_value="extrapolate")
-        Sa = f_interp(T)
-    else:
-        st.sidebar.warning("""
-        ⚠️ Upload .xlsx, .txt, or .csv file  
-        • Periods (s) in first column  
-        • Spectral acceleration (g) in second column  
-        • 🚫 No headers.
-        """)
-        Sa = np.zeros_like(T)
-        st.stop()
 
-elif Spectrum_Option == 'NTC':
+if Spectrum_Option == 'NTC':
     ag = st.sidebar.number_input("Outcrop PGA ag (g)", value=0.25, format="%.3f")
     Tc_g = st.sidebar.number_input("Corner period TC* (s)", value=0.38, format="%.3f")
     F0 = st.sidebar.number_input("Amplification factor F0", value=2.30, format="%.3f")
@@ -229,9 +203,33 @@ elif Spectrum_Option == 'EC82 (evolution)':
     csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
     csi = csi/100
     Sa = FN_SpectrumEC8_2(T, S_alfa, S_beta, F_alfa, F_beta, FT, csi)
-if Sa is None or np.all(Sa == 0):
-    st.error("Lo spettro calcolato è vuoto o non valido.")
-    st.stop()
+
+elif Spectrum_Option == 'Custom':
+    csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
+    csi = csi/100
+    uploaded_file = st.sidebar.file_uploader("(xlsx, csv, txt format)", type=["xlsx", "csv", "txt"])
+    if uploaded_file is not None:
+        filename = uploaded_file.name.lower()
+        if filename.endswith(".xlsx"):
+            FFF = pd.read_excel(uploaded_file, header=None).values
+        elif filename.endswith(".csv"):
+            FFF = pd.read_csv(uploaded_file, header=None).values
+        elif filename.endswith(".txt"):
+            FFF = pd.read_csv(uploaded_file, header=None, sep=r"\s+", engine='python').values
+        T_Custom = FFF[:, 0]
+        Sa_Custom = FFF[:, 1]
+        f_interp = interp1d(T_Custom, Sa_Custom, bounds_error=False, fill_value="extrapolate")
+        Sa = f_interp(T)
+    else:
+        st.sidebar.warning("""
+        ⚠️ Upload .xlsx, .txt, or .csv file  
+        • Periods (s) in first column  
+        • Spectral acceleration (g) in second column  
+        • 🚫 No headers.
+        """)
+        Sa = np.zeros_like(T)
+        st.stop()
+
 # =============================================================================
 # CALCOLO
 # =============================================================================
@@ -247,8 +245,7 @@ smorz = csi
 PGA = Sa[0]
 Sa_orig = Sa.copy()
 Sd_orig = Sd.copy()
-conv = 0
-smorz = csi
+
 while conv == 0:
     eta = max((10 / (5 + smorz * 100))**0.5, 0.55)
     Sa = Sa_orig * eta
@@ -257,7 +254,7 @@ while conv == 0:
     T0 = 2 * np.pi * np.sqrt(H / (gr * betaD * D0))
     
     s_int, kH_int = intersect(s, kH, Sd / H, Sa)
-
+    
     if Type_System == 'D':
         I = kC * s_int / alpha - sC * (1 - alpha) * kC / alpha**2 * np.log(1 + s_int * alpha / (sC * (1 - alpha)))
         Iel = kH_int**2 / (2 * betaD * D0)
@@ -272,7 +269,6 @@ while conv == 0:
         
     err = abs(smorz - csi_calc)
     smorz = csi_calc
-    st.sidebar.text(f"Errore corrente: {err:.6f}")
     if err < 0.0005:
         conv = 1
 
@@ -318,7 +314,6 @@ else:
 s1_tot = min(s_int, sC)
 s1 = s1_tot - kH_int / (betaD * D0)
 s_tot = s1 + Neq * s_A  
-
 T_int = 2 * np.pi * (H / gr * s_int / kH_int)**0.5
 
 # =============================================================================
@@ -350,8 +345,7 @@ if Type_System == 'D':
     col8.metric("Permanent Displacement", f"{s1 * H:.3f} m")
 elif Type_System == 'ND':
     col8.metric("Max Transient Displacement", f"{s1_tot * H:.3f} m")
-    
-
+ 
 st.markdown("---")
 
 # =============================================================================
