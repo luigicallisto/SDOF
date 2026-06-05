@@ -247,8 +247,16 @@ smorz = csi
 PGA = Sa[0]
 Sa_orig = Sa.copy()
 Sd_orig = Sd.copy()
-
+st.write("Inizio il calcolo della convergenza...")
+conv = 0
+smorz = csi
+Sa_orig = Sa.copy()
+Sd_orig = Sd.copy()
+# Aggiungiamo un contatore di test
+test_iter = 0
 while conv == 0:
+    test_iter += 1
+    st.sidebar.text(f"Iterazione loop: {test_iter}")
     eta = max((10 / (5 + smorz * 100))**0.5, 0.55)
     Sa = Sa_orig * eta
     Sd = Sd_orig * eta
@@ -256,6 +264,8 @@ while conv == 0:
     T0 = 2 * np.pi * np.sqrt(H / (gr * betaD * D0))
     
     s_int, kH_int = intersect(s, kH, Sd / H, Sa)
+    # Vogliamo vedere cosa restituisce l'intersezione
+    st.sidebar.text(f"s_int: {s_int:.4f}, kH_int: {kH_int:.4f}")
     
     if Type_System == 'D':
         I = kC * s_int / alpha - sC * (1 - alpha) * kC / alpha**2 * np.log(1 + s_int * alpha / (sC * (1 - alpha)))
@@ -271,6 +281,7 @@ while conv == 0:
         
     err = abs(smorz - csi_calc)
     smorz = csi_calc
+    st.sidebar.text(f"Errore corrente: {err:.6f}")
     if err < 0.0005:
         conv = 1
 
