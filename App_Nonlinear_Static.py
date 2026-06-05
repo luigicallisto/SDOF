@@ -247,15 +247,9 @@ smorz = csi
 PGA = Sa[0]
 Sa_orig = Sa.copy()
 Sd_orig = Sd.copy()
-st.write("Inizio il calcolo della convergenza...")
 conv = 0
 smorz = csi
-Sa_orig = Sa.copy()
-Sd_orig = Sd.copy()
-# Aggiungiamo un contatore di test
-test_iter = 0
 while conv == 0:
-    test_iter += 1
     st.sidebar.text(f"Iterazione loop: {test_iter}")
     eta = max((10 / (5 + smorz * 100))**0.5, 0.55)
     Sa = Sa_orig * eta
