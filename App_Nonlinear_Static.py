@@ -229,7 +229,9 @@ elif Spectrum_Option == 'EC82 (evolution)':
     csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
     csi = csi/100
     Sa = FN_SpectrumEC8_2(T, S_alfa, S_beta, F_alfa, F_beta, FT, csi)
-
+if Sa is None or np.all(Sa == 0):
+    st.error("Lo spettro calcolato è vuoto o non valido.")
+    st.stop()
 # =============================================================================
 # CALCOLO
 # =============================================================================
