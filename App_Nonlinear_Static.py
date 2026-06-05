@@ -151,7 +151,7 @@ st.markdown("---")
 st.sidebar.markdown('<p style="font-size:28px; font-weight:bold; color:#00E676;">Initial choices</p>', unsafe_allow_html=True)
 # Parametri Generali
 Type_System = st.sidebar.radio("System Type", ['D', 'ND'], help="D = Displacing, ND = Non-Displacing")
-Spectrum_Option = st.sidebar.selectbox("Spectrum Option", ['NTC', 'EC81', 'EC82 (evolution)', 'Custom'])
+Spectrum_Option = st.sidebar.selectbox("Spectrum Option", ['EC81', 'EC82 (evolution)','Italian NTC','Custom'])
 
 # Parametri Struttura e Modello
 st.sidebar.markdown('<p style="font-size:28px; font-weight:bold; color:#00E676;">Input quantities</p>', unsafe_allow_html=True)
@@ -175,7 +175,7 @@ st.sidebar.markdown('<p style="font-size:28px; font-weight:bold; color:#00E676;"
 gr = 9.81
 T = np.arange(0, 20.0, 0.005)
 
-if Spectrum_Option == 'NTC':
+if Spectrum_Option == 'Italian NTC':
     ag = st.sidebar.number_input("Outcrop PGA ag (g)", value=0.25, format="%.3f")
     Tc_g = st.sidebar.number_input("Corner period TC* (s)", value=0.38, format="%.3f")
     F0 = st.sidebar.number_input("Amplification factor F0", value=2.30, format="%.3f")
@@ -208,6 +208,7 @@ elif Spectrum_Option == 'Custom':
     csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
     csi = csi/100
     uploaded_file = st.sidebar.file_uploader("(xlsx, csv, txt format)", type=["xlsx", "csv", "txt"])
+    
     if uploaded_file is not None:
         filename = uploaded_file.name.lower()
         if filename.endswith(".xlsx"):
@@ -216,20 +217,27 @@ elif Spectrum_Option == 'Custom':
             FFF = pd.read_csv(uploaded_file, header=None).values
         elif filename.endswith(".txt"):
             FFF = pd.read_csv(uploaded_file, header=None, sep=r"\s+", engine='python').values
+        
         T_Custom = FFF[:, 0]
         Sa_Custom = FFF[:, 1]
-        f_interp = interp1d(T_Custom, Sa_Custom, bounds_error=False, fill_value="extrapolate")
+        
+        # SICUREZZA: Ridefiniamo T basandoci sul TUO file per evitare estrapolazioni errate
+        max_T_file = float(np.max(T_Custom))
+        T = np.arange(0, min(20.0, max_T_file), 0.02)
+        
+        # Usiamo un'interpolazione sicura (se T va oltre, assegna l'ultimo valore o 0, NON estrapolare a caso)
+        f_interp = interp1d(T_Custom, Sa_Custom, bounds_error=False, fill_value=(Sa_Custom[0], Sa_Custom[-1]))
         Sa = f_interp(T)
     else:
         st.sidebar.warning("""
         ⚠️ Upload .xlsx, .txt, or .csv file  
-        • Periods (s) in first column  
+        • Periods (s) in first column, first period is zero  
         • Spectral acceleration (g) in second column  
         • 🚫 No headers.
         """)
         Sa = np.zeros_like(T)
         st.stop()
-
+    
 # =============================================================================
 # CALCOLO
 # =============================================================================
@@ -349,39 +357,43 @@ elif Type_System == 'ND':
 st.markdown("---")
 
 # =============================================================================
-# GENERAZIONE DEI GRAFICI CONDIZIONALI
+# GENERAZIONE DEI GRAFICI CONDIZIONALI (ATTESA SELETTIVA)
 # =============================================================================
 
-if Type_System == 'D':
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.5))
-else:
-    fig, ax1 = plt.subplots(1, 1, figsize=(5, 3.5))
-    ax2 = None  
+# Lo spinner si attiva solo qui, indicando chiaramente che sta creando i grafici
+with st.spinner("Generating plots..."):
+    if Type_System == 'D':
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.5))
+    else:
+        fig, ax1 = plt.subplots(1, 1, figsize=(5, 3.5))
+        ax2 = None  
 
-# --- Primo Subplot ---
-ax1.plot(s, kH, label='Capacity curve', color='blue', linewidth=2)
-ax1.plot(Sd_orig / H, Sa_orig, '--', label='Original Spectrum', color='gray')
-ax1.plot(Sd / H, Sa, label='Damped Spectrum', color='orange', linewidth=2)
-ax1.plot(s_int, kH_int, 'ro', markersize=8, label='Performance Point')
-ax1.set_xlim(0, np.max(Sd_orig / H * 1.05))
-ax1.set_ylim(0, np.max(Sa_orig * 1.05))
-ax1.set_xlabel('d/H, Sd/H')
-ax1.set_ylabel('kH, Sa (g)')
-ax1.legend()
-ax1.grid(True)
+    # --- Primo Subplot ---
+    ax1.plot(s, kH, label='Capacity curve', color='blue', linewidth=2)
+    ax1.plot(Sd_orig / H, Sa_orig, '--', label='Original Spectrum', color='gray')
+    ax1.plot(Sd / H, Sa, label='Damped Spectrum', color='orange', linewidth=2)
+    ax1.plot(s_int, kH_int, 'ro', markersize=8, label='Performance Point')
+    ax1.set_xlim(0, np.max(Sd_orig / H * 1.05))
+    ax1.set_ylim(0, np.max(Sa_orig * 1.05))
+    ax1.set_xlabel('d/H, Sd/H')
+    ax1.set_ylabel('kH, Sa (g)')
+    ax1.legend()
+    ax1.grid(True)
 
-# --- Secondo Subplot (SOLO se Type_System è 'D') ---
-if ax2 is not None:
-    ax2.plot(s, s * D0 * betaD, label='Unloading/Reloading line', color='green', linewidth=2)
-    ax2.plot(Sd_ur / H, Sa_ur, label='Unloading/Reloading Spectrum', color='purple', linewidth=2)
-    ax2.plot(s_A, kH_A, 'ro', markersize=8, label='Intersection A')
-    ax2.set_xlim(0, np.max(Sd_orig / H * 1.05))
-    ax2.set_ylim(0, np.max(Sa_orig * 1.05))
-    ax2.set_xlabel('d/H, Sd/H')
-    ax2.set_ylabel('kH, Sa (g)')
-    ax2.set_title('Cyclic response')
-    ax2.legend()
-    ax2.grid(True)
+    # --- Secondo Subplot (SOLO se Type_System è 'D') ---
+    if ax2 is not None:
+        ax2.plot(s, s * D0 * betaD, label='Unloading/Reloading line', color='green', linewidth=2)
+        ax2.plot(Sd_ur / H, Sa_ur, label='Unloading/Reloading Spectrum', color='purple', linewidth=2)
+        ax2.plot(s_A, kH_A, 'ro', markersize=8, label='Intersection A')
+        ax2.set_xlim(0, np.max(Sd_orig / H * 1.05))
+        ax2.set_ylim(0, np.max(Sa_orig * 1.05))
+        ax2.set_xlabel('d/H, Sd/H')
+        ax2.set_ylabel('kH, Sa (g)')
+        ax2.set_title('Cyclic response')
+        ax2.legend()
+        ax2.grid(True)
 
-plt.tight_layout()
-st.pyplot(fig, width='content')
+    plt.tight_layout()
+    
+    # Mostra i grafici dentro lo spinner non appena Matplotlib finisce il rendering
+    st.pyplot(fig, width='content')
