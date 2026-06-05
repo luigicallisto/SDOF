@@ -174,8 +174,34 @@ else:
 st.sidebar.markdown('<p style="font-size:28px; font-weight:bold; color:#00E676;">Spectral parameters</p>', unsafe_allow_html=True)
 gr = 9.81
 T = np.arange(0, 20.0, 0.005)
+Sa = None
+if Spectrum_Option == 'Custom':
+    csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
+    csi = csi/100
+    uploaded_file = st.sidebar.file_uploader("(xlsx, csv, txt format)", type=["xlsx", "csv", "txt"])
+    if uploaded_file is not None:
+        filename = uploaded_file.name.lower()
+        if filename.endswith(".xlsx"):
+            FFF = pd.read_excel(uploaded_file, header=None).values
+        elif filename.endswith(".csv"):
+            FFF = pd.read_csv(uploaded_file, header=None).values
+        elif filename.endswith(".txt"):
+            FFF = pd.read_csv(uploaded_file, header=None, sep=r"\s+", engine='python').values
+        T_Custom = FFF[:, 0]
+        Sa_Custom = FFF[:, 1]
+        f_interp = interp1d(T_Custom, Sa_Custom, bounds_error=False, fill_value="extrapolate")
+        Sa = f_interp(T)
+    else:
+        st.sidebar.warning("""
+        ⚠️ Upload .xlsx, .txt, or .csv file  
+        • Periods (s) in first column  
+        • Spectral acceleration (g) in second column  
+        • 🚫 No headers.
+        """)
+        Sa = np.zeros_like(T)
+        st.stop()
 
-if Spectrum_Option == 'NTC':
+elif Spectrum_Option == 'NTC':
     ag = st.sidebar.number_input("Outcrop PGA ag (g)", value=0.25, format="%.3f")
     Tc_g = st.sidebar.number_input("Corner period TC* (s)", value=0.38, format="%.3f")
     F0 = st.sidebar.number_input("Amplification factor F0", value=2.30, format="%.3f")
@@ -203,32 +229,6 @@ elif Spectrum_Option == 'EC82 (evolution)':
     csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
     csi = csi/100
     Sa = FN_SpectrumEC8_2(T, S_alfa, S_beta, F_alfa, F_beta, FT, csi)
-
-elif Spectrum_Option == 'Custom':
-    csi = st.sidebar.number_input("Spectrum damping ratio (%)", min_value=0.0, max_value=100.0, value=5.0, step=1.0, format="%.0f")
-    csi = csi/100
-    uploaded_file = st.sidebar.file_uploader("(xlsx, csv, txt format)", type=["xlsx", "csv", "txt"])
-    if uploaded_file is not None:
-        filename = uploaded_file.name.lower()
-        if filename.endswith(".xlsx"):
-            FFF = pd.read_excel(uploaded_file, header=None).values
-        elif filename.endswith(".csv"):
-            FFF = pd.read_csv(uploaded_file, header=None).values
-        elif filename.endswith(".txt"):
-            FFF = pd.read_csv(uploaded_file, header=None, sep=r"\s+", engine='python').values
-        T_Custom = FFF[:, 0]
-        Sa_Custom = FFF[:, 1]
-        f_interp = interp1d(T_Custom, Sa_Custom, bounds_error=False, fill_value="extrapolate")
-        Sa = f_interp(T)
-    else:
-        st.sidebar.warning("""
-        ⚠️ Upload .xlsx, .txt, or .csv file  
-        • Periods (s) in first column  
-        • Spectral acceleration (g) in second column  
-        • 🚫 No headers.
-        """)
-        Sa = np.zeros_like(T)
-        st.stop()
 
 # =============================================================================
 # CALCOLO
