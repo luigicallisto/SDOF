@@ -250,7 +250,6 @@ Sd_orig = Sd.copy()
 conv = 0
 smorz = csi
 while conv == 0:
-    st.sidebar.text(f"Iterazione loop: {test_iter}")
     eta = max((10 / (5 + smorz * 100))**0.5, 0.55)
     Sa = Sa_orig * eta
     Sd = Sd_orig * eta
@@ -258,9 +257,7 @@ while conv == 0:
     T0 = 2 * np.pi * np.sqrt(H / (gr * betaD * D0))
     
     s_int, kH_int = intersect(s, kH, Sd / H, Sa)
-    # Vogliamo vedere cosa restituisce l'intersezione
-    st.sidebar.text(f"s_int: {s_int:.4f}, kH_int: {kH_int:.4f}")
-    
+
     if Type_System == 'D':
         I = kC * s_int / alpha - sC * (1 - alpha) * kC / alpha**2 * np.log(1 + s_int * alpha / (sC * (1 - alpha)))
         Iel = kH_int**2 / (2 * betaD * D0)
